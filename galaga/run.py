@@ -126,6 +126,15 @@ class Enemy2(pygame.sprite.Sprite):
                 self.rect.y = self.originy
                 self.rect.x = self.originx
 
+
+class Life(Galaga):
+    
+    def __init__(self, x, y):
+        Galaga.__init__(self)
+        self.rect.x = x
+        self.rect.y = y
+    
+    
 pygame.init()
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -182,6 +191,18 @@ for i in range(6):
 rand_enemy_one = random.randrange(0, 4)
 rand_enemy_two = random.randrange(5, 10)
 
+# create lives
+lives = pygame.sprite.Group()
+life1 = Life(650, 550)
+life2 = Life(700, 550)
+life3 = Life(750, 550)
+lives.add(life1)
+lives.add(life2)
+lives.add(life3)
+all_sprites_list.add(life1)
+all_sprites_list.add(life2)
+all_sprites_list.add(life3)
+
 def start_screen():
     finished = False
     while not finished:
@@ -191,9 +212,11 @@ def start_screen():
                 pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                return 
         screen.fill(BLACK)
         label = fontobj.render("GALAGA", 1, (255, 255, 0))
-        screen.blit(label, (300, 200))
+        screen.blit(label, (350, 50))
         pygame.display.update()
         clock.tick(60)
 
@@ -219,10 +242,11 @@ attacking_enemies = []
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            elif event.key == pygame.K_SPACE:
                 if len(bullet_list) <= 1:
                     info = {"origin": player}
                     bullet = Bullet(**info)
@@ -255,10 +279,12 @@ while running:
             bullet_list.remove(bullet)
             all_sprites_list.remove(bullet)
             score += 1
-            print(score)
         if bullet.rect.y < -10:
             bullet_list.remove(bullet)
             all_sprites_list.remove(bullet)
-
+    
+    label = fontobj.render("Score: {0}".format(score), 1, (255, 255, 0))
+    screen.blit(label, (30, 560))    
     pygame.display.flip()
     clock.tick(60)
+pygame.quit()
