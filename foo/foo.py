@@ -14,6 +14,7 @@ c0.draw()
 running = True
 while running:
     running = utilities.check_for_quit()
+    c0.update()
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
