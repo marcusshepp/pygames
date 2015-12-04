@@ -26,6 +26,10 @@ class Galaga(pygame.sprite.Sprite):
         """ Draw on surface """
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
+    def reset_position(self):
+        self.rect.x = 350
+        self.rect.y = 550
+
 
 class Bullet(pygame.sprite.Sprite):
     """ This class represents the bullet . """
@@ -69,14 +73,6 @@ class Enemy1(pygame.sprite.Sprite):
     def make_attack(self):
         """ attack the player aka galaga """
         if self.rect.y < 750:
-            # if self.left:
-            #     self.rect.x -= 2
-            # else:
-            #     self.rect.x += 2
-            # if abs(self.rect.x - self.originx) == 150:
-            #     self.left = True
-            # elif abs(self.rect.x - self.originx) == 0:
-            #     self.left = False
             self.rect.y += 5
         else: self.rect.y = self.originy
 
@@ -96,8 +92,6 @@ class Enemy2(pygame.sprite.Sprite):
 
     def update(self):
         """ Moving back and fourth through space """
-
-        # move left - right
         if self.left:
             self.rect.x -= 2
         else:
@@ -106,16 +100,16 @@ class Enemy2(pygame.sprite.Sprite):
             self.left = True
         elif abs(self.rect.x - self.originx) == 0:
             self.left = False
-    
+
     def make_attack(self):
         """ attack the player aka galaga """
-        
+
         rand = random.randrange(0, 3)
         if rand == 1:
             self.attack = True
         elif rand == 2:
             self.attack = False
-        
+
         if self.attack:
             if self.rect.y < 750:
                 if self.rect.y == 200:
@@ -128,13 +122,13 @@ class Enemy2(pygame.sprite.Sprite):
 
 
 class Life(Galaga):
-    
+
     def __init__(self, x, y):
         Galaga.__init__(self)
         self.rect.x = x
         self.rect.y = y
-    
-    
+
+
 pygame.init()
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -193,6 +187,7 @@ rand_enemy_two = random.randrange(5, 10)
 
 # create lives
 lives = pygame.sprite.Group()
+lives_index = 0
 life1 = Life(650, 550)
 life2 = Life(700, 550)
 life3 = Life(750, 550)
@@ -202,6 +197,13 @@ lives.add(life3)
 all_sprites_list.add(life1)
 all_sprites_list.add(life2)
 all_sprites_list.add(life3)
+# print(help(pygame.draw.rect))
+
+def draw_box(surface, boxx, boxy, color, width, height):
+    pygame.draw.rect(surface, color, (boxx, boxy, width, height))
+def mouse_over(mx,my,x,y,w,h):
+    if x+w > mx > x and y+h > my > y:
+        return True
 
 def start_screen():
     finished = False
@@ -209,16 +211,26 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
-                pygame.quit()
-            elif event.type == pygame.KEYDOWN:
-                return
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                return 
+            # elif event.type == pygame.KEYDOWN:
+                # return
+                # pass
+            # elif event.type == pygame.MOUSEBUTTONDOWN:
+                # return
+                # pass
         screen.fill(BLACK)
         label = fontobj.render("GALAGA", 1, (255, 255, 0))
         screen.blit(label, (350, 50))
+        start_button = fontobj.render("Start Button", 1, (255, 255, 0))
+        screen.blit(start_button, (300, 300))
+        mouse_coordinates = pygame.mouse.get_pos()
+        clicked = pygame.mouse.get_pressed()
+        # draw_box(screen, 300, 300, BLACK, 255, 255)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if mouse_over(mouse_x, mouse_y, 300, 300, 255, 55) and any(clicked):
+            return
         pygame.display.update()
         clock.tick(60)
+    pygame.quit()
 
 def end_screen():
     finished = False
@@ -229,16 +241,15 @@ def end_screen():
                 pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 finished = True
-                pygame.quit()
         screen.fill(BLACK)
         label = fontobj.render("GAME OVER", 1, (255, 255, 0))
         screen.blit(label, (300, 200))
         pygame.display.update()
         clock.tick(60)
-
+    pygame.quit()
 start_screen()
 attacking_enemies = []
-## Main Program Loop ##
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -262,16 +273,23 @@ while running:
     # win
     if not len(e_list):
         end_screen()
-    # lose
+    # dead
     if pygame.sprite.spritecollide(player, e_list, True):
-        end_screen()
-    
+        if lives_index == 0:
+            life1.kill()
+        elif lives_index == 1:
+            life2.kill()
+        elif lives_index == 2:
+            life3.kill()
+        lives_index += 1
+        player.reset_position()
+    # no more enemies
     if len(attacking_enemies) == 0:
         attacking_enemies.append(enemies[rand_enemy_one])
         attacking_enemies.append(enemies[rand_enemy_two])
     enemies[rand_enemy_one].make_attack()
     enemies[rand_enemy_two].make_attack()
-        
+
     # get rid of bullets and collid with enemies
     for bullet in bullet_list:
         enemies_hit_list = pygame.sprite.spritecollide(bullet, e_list, True)
@@ -282,9 +300,9 @@ while running:
         if bullet.rect.y < -10:
             bullet_list.remove(bullet)
             all_sprites_list.remove(bullet)
-    
+
     label = fontobj.render("Score: {0}".format(score), 1, (255, 255, 0))
-    screen.blit(label, (30, 560))    
+    screen.blit(label, (30, 560))
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
