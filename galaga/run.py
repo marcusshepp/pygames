@@ -66,15 +66,18 @@ class Enemy1(pygame.sprite.Sprite):
         else:
             self.rect.x += 1
         if abs(self.rect.x - self.originx) == 150:
+            # if i've moved 150 px to the left
             self.left = True
         elif abs(self.rect.x - self.originx) == 0:
+            # if I'm in the same position I was instantiated at.
             self.left = False
 
     def make_attack(self):
         """ attack the player aka galaga """
-        if self.rect.y < 750:
+        if self.rect.y < 600:
             self.rect.y += 5
         else: self.rect.y = self.originy
+        # pass
 
 
 class Enemy2(pygame.sprite.Sprite):
@@ -103,28 +106,13 @@ class Enemy2(pygame.sprite.Sprite):
 
     def make_attack(self):
         """ attack the player aka galaga """
-
-        rand = random.randrange(0, 3)
-        if rand == 1:
-            self.attack = True
-        elif rand == 2:
-            self.attack = False
-
-        if self.attack:
-            if self.rect.y < 750:
-                if self.rect.y == 200:
-                    self.rect.x += 100
-                self.rect.y += 8
-                self.rect.x += 5
-            else:
-                self.rect.y = self.originy
-                self.rect.x = self.originx
+        pass
 
 
 class Life(Galaga):
 
     def __init__(self, x, y):
-        Galaga.__init__(self)
+        super().__init__()
         self.rect.x = x
         self.rect.y = y
 
@@ -200,23 +188,33 @@ all_sprites_list.add(life3)
 # print(help(pygame.draw.rect))
 
 def draw_box(surface, boxx, boxy, color, width, height):
+    """
+    in: pygame surface, x coor, y coor, width, height of box
+    out: void
+    Draws a box
+    """
     pygame.draw.rect(surface, color, (boxx, boxy, width, height))
+
 def mouse_over(mx,my,x,y,w,h):
+    """
+    in: mouse x, y coor, box x, y coor, width, height of box
+    out: is the mouse in the box?
+    """
     if x+w > mx > x and y+h > my > y:
         return True
 
+def is_finished(event):
+    return True if event.type == pygame.QUIT else False
+
 def start_screen():
+    """
+    First function to be called.
+    Beginning of the game.
+    """
     finished = False
     while not finished:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                finished = True
-            # elif event.type == pygame.KEYDOWN:
-                # return
-                # pass
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-                # return
-                # pass
+            finished = is_finished(event)
         screen.fill(BLACK)
         label = fontobj.render("GALAGA", 1, (255, 255, 0))
         screen.blit(label, (350, 50))
@@ -233,13 +231,15 @@ def start_screen():
     pygame.quit()
 
 def end_screen():
+    """
+    Last function to be called.
+    End of the game.
+    """
     finished = False
     while not finished:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                finished = True
-                pygame.quit()
-            elif event.type == pygame.KEYDOWN:
+            finished = is_finished(event)
+            if event.type == pygame.KEYDOWN:
                 finished = True
         screen.fill(BLACK)
         label = fontobj.render("GAME OVER", 1, (255, 255, 0))
@@ -247,14 +247,14 @@ def end_screen():
         pygame.display.update()
         clock.tick(60)
     pygame.quit()
+
 start_screen()
 attacking_enemies = []
 
 while running:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
+        finished = is_finished(event)
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
             elif event.key == pygame.K_SPACE:
