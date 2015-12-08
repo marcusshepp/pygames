@@ -75,9 +75,15 @@ class Enemy1(pygame.sprite.Sprite):
     def make_attack(self):
         """ attack the player aka galaga """
         if self.rect.y < 600:
+            # hit bottom of screen
             self.rect.y += 5
         else: self.rect.y = self.originy
-        # pass
+
+        if self.rect.y == 200:
+            print("200")
+        elif self.rect.y == 300:
+            print("300")
+
 
 
 class Enemy2(pygame.sprite.Sprite):
@@ -122,8 +128,6 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
-score = 0
-running = True
 clock = pygame.time.Clock()
 size = (800, 600)
 screen = pygame.display.set_mode(size)
@@ -222,7 +226,6 @@ def start_screen():
         screen.blit(start_button, (300, 300))
         mouse_coordinates = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()
-        # draw_box(screen, 300, 300, BLACK, 255, 255)
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if mouse_over(mouse_x, mouse_y, 300, 300, 255, 55) and any(clicked):
             return
@@ -248,15 +251,28 @@ def end_screen():
         clock.tick(60)
     pygame.quit()
 
+def pause():
+    finished = False
+    while not finished:
+        for event in pygame.event.get():
+            finished = is_finished(event)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    finished = True
+    return
+
 start_screen()
 attacking_enemies = []
-
-while running:
+score = 0
+finished = False
+while not finished:
     for event in pygame.event.get():
         finished = is_finished(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                finished = True
+            elif event.key == pygame.K_p:
+                pause()
             elif event.key == pygame.K_SPACE:
                 if len(bullet_list) <= 1:
                     info = {"origin": player}
