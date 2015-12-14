@@ -113,7 +113,6 @@ def start_screen():
         screen.blit(start_button, (300, 300))
         mouse_coordinates = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()
-        # draw_box(screen, 300, 300, BLACK, 255, 255)
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if mouse_over(mouse_x, mouse_y, 300, 300, 255, 55) and any(clicked):
             return
@@ -139,15 +138,28 @@ def end_screen():
         clock.tick(60)
     pygame.quit()
 
+def pause():
+    finished = False
+    while not finished:
+        for event in pygame.event.get():
+            finished = is_finished(event)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    finished = True
+    return
+
 start_screen()
 attacking_enemies = []
-
-while running:
+score = 0
+finished = False
+while not finished:
     for event in pygame.event.get():
         finished = is_finished(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                finished = True
+            elif event.key == pygame.K_p:
+                pause()
             elif event.key == pygame.K_SPACE:
                 if len(bullet_list) <= 1:
                     info = {"origin": player}
