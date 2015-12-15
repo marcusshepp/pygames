@@ -10,3 +10,5 @@ def check_for_quit():
             if evnt.key == pygame.K_ESCAPE:
                 return False
     return True
+    
+BLACK = (0, 0, 0)
