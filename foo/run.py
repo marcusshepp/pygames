@@ -5,17 +5,19 @@ import creature
 
 
 pygame.init()
-size = (800, 600)
+size = (1000, 900)
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
-c0 = creature.Creature(screen, (0, 0, 255), (500, 500))
-c0.draw()
+c0 = creature.Creature(screen, (100, 200))
+f = creature.Food(screen, (300, 100))
 
 running = True
 while running:
     running = utilities.check_for_quit()
     screen.fill(utilities.BLACK)
-    c0.update()
+    f.draw()
+    c0.draw()
+    c0.handle_keys()
     pygame.display.flip()
     pygame.time.delay(30)
 pygame.quit()

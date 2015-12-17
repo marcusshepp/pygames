@@ -1,34 +1,54 @@
+import time
+
 import pygame
+
+import utilities
 
 
 class Creature(pygame.sprite.Sprite):
 
-    def __init__(self, screen, color, location):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, surface, location):
+        super().__init__()
+        self.image = pygame.image.load("assets/images/cell.png").convert()
+        self.rect = self.image.get_rect()
+        self.rect.x = location[0]
+        self.rect.y = location[1]
         self.screen = pygame.display.get_surface()
-        self.area = self.screen.get_rect()
-        self.location = list(location)
-        self.color = color
-        self.screen = screen
+        self.surface = surface
 
+    def handle_keys(self):
+        """ Handles Keys """
+        key = pygame.key.get_pressed()
+        dist = 12
+        if key[pygame.K_RIGHT] and self.rect.x < self.screen.get_size()[0] - 50:
+            self.rect.x += dist
+        elif key[pygame.K_LEFT] and self.rect.x > 10:
+            self.rect.x -= dist
+        elif key[pygame.K_UP] and self.rect.y > 8:
+            self.rect.y -= dist
+        elif key[pygame.K_DOWN] and self.rect.y < self.screen.get_size()[1] - 55:
+            self.rect.y += dist
+        elif key[pygame.K_e]:
+            self.eat()
+            
     def draw(self):
-        pygame.draw.circle(self.screen, self.color, self.location, 10)
-
-    def update(self):
-        nxt = next(self.next_move())
-        for i, v in enumerate(self.location):
-            self.location[i] += nxt[i]
-        pygame.draw.circle(self.screen, self.color, self.location, 10)
+        """ Draw on surface """
+        self.surface.blit(self.image, (self.rect.x, self.rect.y))
     
-    def next_move(self):
-        screen_size = self.screen.get_size()
-        next_location = list()
-        if self.location[0] < screen_size[0]: # bottom of screen
-            next_location.append(1)
-            if self.location[1] < screen_size[1]: # right side of screen
-                next_location.append(1)
-            else:
-                next_location.append(-100)
-        else:
-            next_location.append(-100)
-        yield next_location
+    def eat(self):
+        print("eating")
+        # time.sleep(100)
+
+
+class Food(pygame.sprite.Sprite):
+    
+    def __init__(self, surface, location):
+        super().__init__()
+        self.image = pygame.image.load("assets/images/food.png").convert()
+        self.rect = self.image.get_rect()
+        self.rect.x = location[0]
+        self.rect.y = location[1]
+        self.surface = surface
+        
+    def draw(self):
+        self.surface.blit(self.image, (self.rect.x, self.rect.y))
