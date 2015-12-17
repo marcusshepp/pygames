@@ -52,3 +52,6 @@ class Food(pygame.sprite.Sprite):
         
     def draw(self):
         self.surface.blit(self.image, (self.rect.x, self.rect.y))
+
+    def remove(self):
+        pygame.draw.circle(self.surface, utilities.BLACK, (self.rect.x,self.rect.y), 10)

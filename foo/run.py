@@ -18,6 +18,9 @@ while running:
     f.draw()
     c0.draw()
     c0.handle_keys()
+    if c0.rect.colliderect(f.rect):
+        print("EATING")
+        f.remove()
     pygame.display.flip()
     pygame.time.delay(30)
 pygame.quit()
