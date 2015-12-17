@@ -23,7 +23,12 @@ class Creature(pygame.sprite.Sprite):
     def next_move(self):
         screen_size = self.screen.get_size()
         next_location = list()
-        if self.location[0] < screen_size[0]:
-            if self.location[1] < screen_size[1]:
-                yield (1, 1)
-        
+        if self.location[0] < screen_size[0]: # bottom of screen
+            next_location.append(1)
+            if self.location[1] < screen_size[1]: # right side of screen
+                next_location.append(1)
+            else:
+                next_location.append(-100)
+        else:
+            next_location.append(-100)
+        yield next_location
